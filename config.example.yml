@@ -1,0 +1,6 @@
+refreshTime: 180
+server:
+  host: ftp.your-host.com
+  username: yourLogin
+  password: yourPassword
+currentIp: 

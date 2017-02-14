@@ -1,0 +1,23 @@
+{
+  "name": "dyn-ip",
+  "version": "0.0.1",
+  "description": "Let this soft run on any machine on your local network, and it will update a file on your web server with your public IP through FTP.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "Dynamic",
+    "DNS",
+    "Client",
+    "NodeJS",
+    "FTP"
+  ],
+  "author": "Nicolas Baudet",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "fs": "0.0.1-security",
+    "js-yaml": "^3.8.1",
+    "public-ip": "^2.3.3"
+  }
+}
