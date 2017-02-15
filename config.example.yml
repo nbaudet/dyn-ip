@@ -3,4 +3,4 @@ server:
   host: ftp.your-host.com
   username: yourLogin
   password: yourPassword
-currentIp: 
+  path: yourPath
