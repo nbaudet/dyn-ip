@@ -1,7 +1,7 @@
 yaml = require('js-yaml');
 fs = require('fs');
 const publicIp = require('public-ip');
-var JSFtp = require("jsftp");
+var nodeFtp = require('ftp');
 
 // Get config Yaml content, or throw exception on error
 function readYaml(fileName) {
@@ -31,42 +31,42 @@ function writeJson(fileName, content) {
     }
 }
 
-// Upload a single file to the server
-function uploadSingleFile(ftp, sourcePath, destPath, callback) {
-    ftp.put(sourcePath, destPath, function(hadError) {
-        if (!hadError) {
-            console.log("Successfully uploaded " + sourcePath + " to " + destPath);
-        }
-        if (callback) callback(ftp);
-    });
-}
-
 // Uploads the files to the server
 function uploadFiles(config) {
     try {
-        let ftp = new JSFtp({
+        // List of files to upload
+        var files = [{
+            source: "pub/index.html",
+            target: config.server.path + "/index.html"
+        }, {
+            source: "pub/redirect.json",
+            target: config.server.path + "/redirect.json"
+        }];
+
+        var ftp = new nodeFtp();
+
+        ftp.on('greeting', function(msg) {
+            console.log("FTP server is greeting with:")
+            console.log(msg);
+        }).on('ready', function() {
+            // Tests existence of destination folder and creates it if needed
+            // ...
+
+            files.forEach(function(element) {
+                ftp.put(element.source, element.target, function(err) {
+                    if (err) throw err;
+                    else console.log(element.source + " was uploaded to " + element.target);
+                    ftp.end();
+                });
+            })
+        });
+
+        // Launch async uploads
+        ftp.connect({
             host: config.server.host,
-            //port: 3331, // defaults to 21
-            user: config.server.username, // defaults to "anonymous"
-            pass: config.server.password, // defaults to "@anonymous"
-            debugMode: true
+            user: config.server.username,
+            password: config.server.password
         });
-        ftp.on('progress', function(progress) {
-            console.log(progress);
-        })
-        ftp.on('jsftp_debug', function(eventType, data) {
-            console.log('DEBUG: ', eventType);
-            console.log(JSON.stringify(data, null, 2));
-        });
-
-        // Tests existence of destination folder and creates it if needed
-        // ...
-
-        // Uploads the file
-        uploadSingleFile(ftp, "pub/index.html", config.server.path + "/index.html",
-            uploadSingleFile(ftp, "pub/redirect.json", config.server.path + "/redirect.json")
-        );
-
     } catch (e) {
         console.log(e);
     }
@@ -95,19 +95,7 @@ function main() {
             // ... public file*/
 
         // Updates the redirector
-        //uploadFiles(config);
-
-        let ftp = new JSFtp({
-            host: config.server.host,
-            port: 21,
-            user: config.server.username, // defaults to "anonymous"
-            pass: config.server.password, // defaults to "@anonymous"
-            debugMode: true
-        });
-
-        uploadSingleFile(ftp, "pub/index.html", config.server.path + "/index.html");
-        uploadSingleFile(ftp, "pub/redirect.json", config.server.path + "/redirect.json")
-        //}
+        uploadFiles(config);
     });
 }
 

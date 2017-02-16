@@ -38,3 +38,4 @@ jspm_packages
 
 # Custom files
 config.yml
+.vscode

@@ -17,8 +17,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "fs": "0.0.1-security",
+    "ftp": "^0.3.10",
     "js-yaml": "^3.8.1",
-    "jsftp": "^1.5.5",
     "public-ip": "^2.3.3"
   }
 }
