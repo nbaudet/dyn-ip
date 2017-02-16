@@ -16,7 +16,11 @@ npm install
 2. Rename or copy `config.example.yml` to `config.yml` and set the correct FTP values. Set the path to the where you want the files to be uploaded, i.e. "dyn-ip". **Be careful not to overwrite an existing index.html file** by giving an existing path.
 
 ## Launch as a deamon
-...
+You must install `forever` globally
+```
+npm install -g forever
+```
+Then launch the program with `forever app.js`
 
 ## Start at boot-time on a Raspberry Pi
 ...

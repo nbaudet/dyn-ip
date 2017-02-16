@@ -1,15 +1,23 @@
+schedule = require('node-schedule');
 yaml = require('js-yaml');
 fs = require('fs');
 const publicIp = require('public-ip');
 var nodeFtp = require('ftp');
 
+const defaultRedirect = {
+    lastIp: '',
+    log: []
+};
+
 // Get config Yaml content, or throw exception on error
 function readYaml(fileName) {
-    fileName = fileName || 'config.yml';
     try {
         return yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
     } catch (e) {
-        console.log(e);
+        if (e.code == 'ENOENT')
+            console.log("The file 'config.yml' does not exist. Create one from 'config.example.yml'.")
+        else console.log(e);
+        process.exit();
     }
 }
 
@@ -49,7 +57,7 @@ function uploadFiles(config) {
             console.log("FTP server is greeting with:")
             console.log(msg);
         }).on('ready', function() {
-            // Tests existence of destination folder and creates it if needed
+            // TODO: Tests existence of destination folder and create it if needed
             // ...
 
             files.forEach(function(element) {
@@ -73,30 +81,35 @@ function uploadFiles(config) {
 }
 
 function main() {
-    var config = readYaml();
+    var history = readYaml('history.yml');
+    if (!history) history = defaultRedirect;
 
     // Get the public IP
-    publicIp.v4({ https: true }).then(ip => {
-        console.log(ip);
-
-        let pubConfig = {
-            redirectIp: ip,
-            oldIps: []
-        };
-
-        writeJson("pub/redirect.json", pubConfig);
+    publicIp.v4({ https: true }).then(currentIp => {
+        console.log('Current IP : ' + currentIp);
 
         // If there is a new IP...
-        /*if (ip != config.currentIp) {
-            console.log("Writing new IP to config file.");
-            config.currentIp = ip;
-            // Updates the config files (local and public)
-            writeYaml('config.yml', config);
-            // ... public file*/
+        if (currentIp != history.lastIp) {
+            console.log("Writing a new IP to config file and uploading...");
+            
+            history.log.push({ip: currentIp, date: new Date()});
+            history.lastIp = currentIp;
 
-        // Updates the redirector
-        uploadFiles(config);
+            // ... updates the history (local and public)
+            writeYaml('history.yml', history);
+            writeJson("pub/redirect.json", history);
+
+            // ... and uploads the file
+            uploadFiles(config);
+        } else {
+            console.log('Nothing to update');
+        }
     });
 }
 
-main();
+var config = readYaml('config.yml');
+
+var rule = new schedule.RecurrenceRule();
+rule.minute = config.refreshTime;
+
+schedule.scheduleJob(rule.minute, main());

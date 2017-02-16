@@ -16,9 +16,11 @@
   "author": "Nicolas Baudet",
   "license": "GPL-3.0",
   "dependencies": {
+    "forever": "^0.15.3",
     "fs": "0.0.1-security",
     "ftp": "^0.3.10",
     "js-yaml": "^3.8.1",
+    "node-schedule": "^1.2.0",
     "public-ip": "^2.3.3"
   }
 }

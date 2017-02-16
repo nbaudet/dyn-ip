@@ -15,9 +15,9 @@
         req.onreadystatechange = function() {
             if (req.readyState == 4 && req.status == "200") {
                 json = JSON.parse(req.responseText);
-                console.debug("Your public IP: " + json.redirectIp);
+                console.debug("Your public IP: " + json.lastIp);
                 var elem = document.getElementById("ip");
-                elem.innerHTML = '<p>Your public IP is: <a href="http://' + json.redirectIp + '">' + json.redirectIp + '</a></p>';
+                elem.innerHTML = '<p>Your public IP is: <a href="http://' + json.lastIp + '">' + json.lastIp + '</a></p>';
             }
         }
         req.send(null);

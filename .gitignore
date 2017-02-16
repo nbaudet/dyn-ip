@@ -39,3 +39,4 @@ jspm_packages
 # Custom files
 config.yml
 .vscode
+pub/redirect.json
