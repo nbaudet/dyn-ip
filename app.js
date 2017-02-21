@@ -10,14 +10,18 @@ const defaultRedirect = {
 };
 
 // Get config Yaml content, or throw exception on error
-function readYaml(fileName) {
+function readYaml(fileName, killOnError) {
+    killOnError = (typeof killOnError !== 'undefined') ? killOnError : true;
     try {
         return yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
     } catch (e) {
-        if (e.code == 'ENOENT')
-            console.log("The file 'config.yml' does not exist. Create one from 'config.example.yml'.")
-        else console.log(e);
-        process.exit();
+        if (e.code == 'ENOENT') {
+            console.log("The file " + fileName + " does not exist.");
+            if (fileName == "config.yml")
+                console.log("Create one from 'config.example.yml'.");
+        } else console.log(e);
+
+        if (killOnError) process.exit();
     }
 }
 
@@ -49,6 +53,9 @@ function uploadFiles(config) {
         }, {
             source: "pub/redirect.json",
             target: config.server.path + "/redirect.json"
+        }, {
+            source: "pub/style.min.css",
+            target: config.server.path + "/style.min.css"
         }];
 
         var ftp = new nodeFtp();
@@ -81,8 +88,8 @@ function uploadFiles(config) {
 }
 
 function main() {
-    var history = readYaml('history.yml');
-    if (!history) history = defaultRedirect;
+    var history = readYaml('history.yml', false);
+    history = (typeof history != undefined) ? history : defaultRedirect;
 
     // Get the public IP
     publicIp.v4({ https: true }).then(currentIp => {
@@ -91,8 +98,8 @@ function main() {
         // If there is a new IP...
         if (currentIp != history.lastIp) {
             console.log("Writing a new IP to config file and uploading...");
-            
-            history.log.push({ip: currentIp, date: new Date()});
+
+            history.log.unshift({ ip: currentIp, date: new Date() });
             history.lastIp = currentIp;
 
             // ... updates the history (local and public)
