@@ -1,4 +1,4 @@
-![alt text](https://github.com/nbaudet/dyn-ip/pub/logo-dyn-ip.png "# dyn-ip")
+![# dyn-ip](https://raw.githubusercontent.com/nbaudet/dyn-ip/master/pub/logo-dyn-ip.png "dyn-ip logo")
 ## What this package does
 Let this soft run on any machine on your local network, and it will update a file on your web server with your public IP through FTP.
 It is useful when you have a dynamic IP address AND a webserver and don't want to use a dynDNS client.
