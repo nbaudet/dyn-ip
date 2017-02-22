@@ -56,6 +56,9 @@ function uploadFiles(config) {
         }, {
             source: "pub/style.min.css",
             target: config.server.path + "/style.min.css"
+        }, {
+            source: "pub/logo-dyn-ip.png",
+            target: config.server.path + "/logo-dyn-ip.png"
         }];
 
         var ftp = new nodeFtp();
