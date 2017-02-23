@@ -20,7 +20,6 @@
         "url": "git://github.com/nbaudet/dyn-ip.git"
     },
     "dependencies": {
-        "forever": "^0.15.3",
         "fs": "0.0.1-security",
         "ftp": "^0.3.10",
         "js-yaml": "^3.8.1",

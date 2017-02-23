@@ -119,7 +119,9 @@ function main() {
 
 var config = readYaml('config.yml');
 
-var rule = new schedule.RecurrenceRule();
-rule.minute = config.refreshTime;
+//var rule = new schedule.RecurrenceRule();
+//rule.minute = config.refreshTime;
 
-schedule.scheduleJob(rule.minute, main());
+var rule = '*/20 * * * * *'; // www.crontab.org
+
+schedule.scheduleJob(rule, main());
