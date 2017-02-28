@@ -1,6 +1,10 @@
 schedule = require('node-schedule');
 yaml = require('js-yaml');
 fs = require('fs');
+argv = require('yargs')
+    .usage('Usage: $0 -w [num] -h [num]')
+    .demandOption(['w','h'])
+    .argv;
 const publicIp = require('public-ip');
 var nodeFtp = require('ftp');
 
@@ -129,6 +133,9 @@ function main() {
     });
 }
 
+var test = argv;
+console.log(test);
+
 var config = readYaml('config.yml');
 
-schedule.scheduleJob(getRule(config), main);
+//schedule.scheduleJob(getRule(config), main);
