@@ -43,6 +43,18 @@ function writeJson(fileName, content) {
     }
 }
 
+// Return a cron schedule from the config file
+function getRule(config){
+    var rule = "";
+    rule += config.refreshTime.second != '*' ? config.refreshTime.second + " " : '* ';
+    rule += config.refreshTime.minute != '*' ? config.refreshTime.minute + " " : '* ';
+    rule += config.refreshTime.hour != '*' ? config.refreshTime.hour + " " : '* ';
+    rule += config.refreshTime.day != '*' ? config.refreshTime.day + " " : '* ';
+    rule += config.refreshTime.month != '*' ? config.refreshTime.month + " " : '* ';
+    rule += config.refreshTime.year != '*' ? config.refreshTime.year : '*';
+    return rule;
+}
+
 // Uploads the files to the server
 function uploadFiles(config) {
     try {
@@ -96,7 +108,7 @@ function main() {
 
     // Get the public IP
     publicIp.v4({ https: true }).then(currentIp => {
-        console.log('Current IP : ' + currentIp);
+        console.log('Current IP : ' + currentIp + " @ " + new Date());
 
         // If there is a new IP...
         if (currentIp != history.lastIp) {
@@ -119,9 +131,4 @@ function main() {
 
 var config = readYaml('config.yml');
 
-//var rule = new schedule.RecurrenceRule();
-//rule.minute = config.refreshTime;
-
-var rule = '*/20 * * * * *'; // www.crontab.org
-
-schedule.scheduleJob(rule, main());
+schedule.scheduleJob(getRule(config), main);

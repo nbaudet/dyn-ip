@@ -1,4 +1,10 @@
-refreshTime: 180
+refreshTime: # Check http://www.crontab.org for scheduling syntax guide
+  second: '0' # Zero is necessary when a value is declared later, like here for 'hour'
+  minute: '0'
+  hour: '*/3' # The job will execute every three hours
+  day: '*'
+  month: '*'
+  year: '*'
 server:
   host: ftp.your-host.com
   username: yourLogin
