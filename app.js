@@ -2,8 +2,10 @@ schedule = require('node-schedule');
 yaml = require('js-yaml');
 fs = require('fs');
 argv = require('yargs')
-    .usage('Usage: $0 -w [num] -h [num]')
-    .demandOption(['w','h'])
+    .usage('Usage: node $0 <once>')
+    .describe('once', 'Run only the script once. Without this parameter, dyn-ip will run as a cron, as specified in config.yml')
+    .help('h')
+    .alias('h', 'help')
     .argv;
 const publicIp = require('public-ip');
 var nodeFtp = require('ftp');
@@ -20,9 +22,11 @@ function readYaml(fileName, killOnError) {
         return yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
     } catch (e) {
         if (e.code == 'ENOENT') {
-            console.log("The file " + fileName + " does not exist.");
+            console.log("ERROR: The file " + fileName + " does not exist.");
             if (fileName == "config.yml")
                 console.log("Create one from 'config.example.yml'.");
+            else if (fileName == "history.yml")
+                return defaultRedirect;
         } else console.log(e);
 
         if (killOnError) process.exit();
@@ -108,7 +112,6 @@ function uploadFiles(config) {
 
 function main() {
     var history = readYaml('history.yml', false);
-    history = (typeof history != undefined) ? history : defaultRedirect;
 
     // Get the public IP
     publicIp.v4({ https: true }).then(currentIp => {
@@ -133,9 +136,12 @@ function main() {
     });
 }
 
-var test = argv;
-console.log(test);
-
 var config = readYaml('config.yml');
 
-//schedule.scheduleJob(getRule(config), main);
+if(argv._ == 'once'){
+    console.log('Launching dyn-ip ONCE')
+    main()
+} else {
+    console.log('Launching dyn-ip as a cron')
+    schedule.scheduleJob(getRule(config), main)
+}
