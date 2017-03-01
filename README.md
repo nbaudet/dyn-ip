@@ -28,7 +28,7 @@ node app.js
 ## Launch as a deamon
 You must install `forever` globally
 ```bash
-npm install -g forever
+sudo npm install -g forever
 ```
 Then launch the program with
 ```bash
@@ -36,7 +36,7 @@ forever start app.js
 ```
 
 ## Start at boot-time on a Raspberry Pi
-First install the app, then write the following code at the end of `/etc/rc.local`
+First install the app, then install forever and finally write the following code at the end of `/etc/rc.local`
 ```bash
 forever start ~/dyn-ip/app.js
 ```
