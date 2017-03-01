@@ -17,7 +17,7 @@ const defaultRedirect = {
 
 /**
  * Get config Yaml content, or throw exception on error
- * @param {string} fileName the Filename
+ * @param {string} fileName The file name
  * @param {boolean} killOnError Kill the process in case of error. Default: true
  */
 function readYaml(fileName, killOnError) {
@@ -39,8 +39,8 @@ function readYaml(fileName, killOnError) {
 
 /**
  * Save content to yaml file
- * @param {string} fileName 
- * @param {object} content 
+ * @param {string} fileName The file name
+ * @param {object} content Any object can be the content
  */
 function writeYaml(fileName, content) {
     try {
@@ -52,8 +52,8 @@ function writeYaml(fileName, content) {
 
 /**
  * Save content to json file
- * @param {string} fileName 
- * @param {string} content 
+ * @param {string} fileName The file name
+ * @param {object} content Any object can be the content
  */
 function writeJson(fileName, content) {
     try {
@@ -65,7 +65,7 @@ function writeJson(fileName, content) {
 
 /**
  * Return a cron schedule from the config file
- * @param {object} config 
+ * @param {object} config The program's configuration
  */
 function getRule(config){
     var rule = "";
@@ -78,7 +78,10 @@ function getRule(config){
     return rule;
 }
 
-// Uploads the files to the server
+/**
+ * Uploads the files to the server
+ * @param {object} config The program's configuration
+ */
 function uploadFiles(config) {
     try {
         // List of files to upload
@@ -125,6 +128,9 @@ function uploadFiles(config) {
     }
 }
 
+/**
+ * Main program
+ */
 function main() {
     var history = readYaml('history.yml', false);
 
@@ -153,10 +159,11 @@ function main() {
 
 var config = readYaml('config.yml');
 
+// Checks if the argument 'once' is set or launches the cron
 if(argv._ == 'once'){
     console.log('Launching dyn-ip ONCE')
-    main()
+    main();
 } else {
-    console.log('Launching dyn-ip as a cron')
-    schedule.scheduleJob(getRule(config), main)
+    console.log('Launching dyn-ip as a CRON')
+    schedule.scheduleJob(getRule(config), main);
 }
