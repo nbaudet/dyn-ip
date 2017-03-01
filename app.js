@@ -1,21 +1,25 @@
-schedule = require('node-schedule');
-yaml = require('js-yaml');
-fs = require('fs');
-argv = require('yargs')
+const schedule = require('node-schedule');
+const yaml = require('js-yaml');
+const fs = require('fs');
+const argv = require('yargs')
     .usage('Usage: node $0 <once>')
     .describe('once', 'Run only the script once. Without this parameter, dyn-ip will run as a cron, as specified in config.yml')
     .help('h')
     .alias('h', 'help')
     .argv;
 const publicIp = require('public-ip');
-var nodeFtp = require('ftp');
+const nodeFtp = require('ftp');
 
 const defaultRedirect = {
     lastIp: '',
     log: []
 };
 
-// Get config Yaml content, or throw exception on error
+/**
+ * Get config Yaml content, or throw exception on error
+ * @param {string} fileName the Filename
+ * @param {boolean} killOnError Kill the process in case of error. Default: true
+ */
 function readYaml(fileName, killOnError) {
     killOnError = (typeof killOnError !== 'undefined') ? killOnError : true;
     try {
@@ -33,7 +37,11 @@ function readYaml(fileName, killOnError) {
     }
 }
 
-// Save content to yaml file
+/**
+ * Save content to yaml file
+ * @param {string} fileName 
+ * @param {object} content 
+ */
 function writeYaml(fileName, content) {
     try {
         fs.writeFileSync(fileName, yaml.safeDump(content))
@@ -42,7 +50,11 @@ function writeYaml(fileName, content) {
     }
 }
 
-// Save content to json file
+/**
+ * Save content to json file
+ * @param {string} fileName 
+ * @param {string} content 
+ */
 function writeJson(fileName, content) {
     try {
         fs.writeFileSync(fileName, JSON.stringify(content), 'utf8')
@@ -51,7 +63,10 @@ function writeJson(fileName, content) {
     }
 }
 
-// Return a cron schedule from the config file
+/**
+ * Return a cron schedule from the config file
+ * @param {object} config 
+ */
 function getRule(config){
     var rule = "";
     rule += config.refreshTime.second != '*' ? config.refreshTime.second + " " : '* ';
