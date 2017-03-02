@@ -41,3 +41,4 @@ config.yml
 history.yml
 .vscode
 pub/redirect.json
+*.log

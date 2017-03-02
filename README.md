@@ -38,5 +38,5 @@ forever start app.js
 ## Start at boot-time on a Raspberry Pi
 First install the app, then install forever and finally write the following code at the end of `/etc/rc.local`
 ```bash
-forever start ~/dyn-ip/app.js
+forever start -o ~/dyn-ip/dyn-ip.log -e ~/dyn-ip/error.log ~/dyn-ip/app.js
 ```
