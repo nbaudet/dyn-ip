@@ -16,6 +16,8 @@ npm install
 cp config.example.yml config.yml
 # -> Now edit config.yml with nano or vim
 
+# -> Set the path in ´app.js´ at line 18, to the folder where dyn-ip is installed
+
 # Execute just once
 node app.js once
 # Or launch the cron
@@ -36,7 +38,11 @@ forever start app.js
 ```
 
 ## Start at boot-time on a Raspberry Pi
-First install the app, then install forever and finally write the following code at the end of `/etc/rc.local`
-```bash
-forever start -o ~/dyn-ip/dyn-ip.log -e ~/dyn-ip/error.log ~/dyn-ip/app.js
-```
+1. First install the app, then install forever
+2. Modify the dyn-ip file according to your settings, and your node version and directory. You can visit http://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html for more help.
+3. Copy the file `dyn-ip` to `/etc/init.d` as administrator
+4. Make the script executable with `sudo chmod 755 /etc/init.d/dyn-ip`
+5. Test start your program with `sudo /etc/init.d/dyn-ip start`
+6. Register your script to run at startup with `sudo update-rc.d dyn-ip defaults`
+
+You can remove the script from startup with `sudo update-rc.d -f dyn-ip remove`

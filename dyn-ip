@@ -1,0 +1,34 @@
+#! /bin/sh
+# /etc/init.d/dyn-dns 
+
+### BEGIN INIT INFO
+# Provides:          dyn-ip
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Starts dyn-ip as a deamon at boot
+# Description:       Starts dyn-ip as a deamon at boot and stops it at shutdown
+### END INIT INFO
+
+# Author: Nicolas Baudet
+
+# If you want a command to always run, put it here
+
+# Carry out specific functions when asked to by the system
+case "$1" in
+  start)
+    echo "Starting dyn-ip"
+    /home/nicolas/.nvm/versions/node/v6.2.0/bin/forever start -o ~/programming/dyn-ip/dyn-ip.log -e ~/programming/dyn-ip/error.log ~/programming/dyn-ip/app.js
+    ;;
+  stop)
+    echo "Stopping dyn-ip"
+    /home/nicolas/.nvm/versions/node/v6.2.0/bin/forever stop ~/programming/dyn-ip/app.js
+    ;;
+  *)
+    echo "Usage: /etc/init.d/dyn-ip {start|stop}"
+    exit 1
+    ;;
+esac
+
+exit 0

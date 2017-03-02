@@ -15,6 +15,8 @@ const defaultRedirect = {
     log: []
 };
 
+const path = '/home/nicolas/programming/dyn-ip/';
+
 /**
  * Get config Yaml content, or throw exception on error
  * @param {string} fileName The file name
@@ -23,15 +25,17 @@ const defaultRedirect = {
 function readYaml(fileName, killOnError) {
     killOnError = (typeof killOnError !== 'undefined') ? killOnError : true;
     try {
+        fileName = path + fileName;
         return yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
     } catch (e) {
         if (e.code == 'ENOENT') {
-            console.log("ERROR: The file " + fileName + " does not exist.");
-            if (fileName == "config.yml")
-                console.log("Create one from 'config.example.yml'.");
-            else if (fileName == "history.yml")
+            if (fileName == "config.yml"){
+                console.error("ERROR: The file " + fileName + " does not exist.");
+                console.error("Create one from 'config.example.yml'.");
+            } else if (fileName == "history.yml"){
                 return defaultRedirect;
-        } else console.log(e);
+            } else console.error("ERROR: The file " + fileName + " does not exist.");
+        } else console.error(e);
 
         if (killOnError) process.exit();
     }
@@ -44,9 +48,10 @@ function readYaml(fileName, killOnError) {
  */
 function writeYaml(fileName, content) {
     try {
+        fileName = path + fileName;
         fs.writeFileSync(fileName, yaml.safeDump(content))
     } catch (e) {
-        console.log(e);
+        console.error(e);
     }
 }
 
@@ -57,9 +62,10 @@ function writeYaml(fileName, content) {
  */
 function writeJson(fileName, content) {
     try {
+        fileName = path + fileName;
         fs.writeFileSync(fileName, JSON.stringify(content), 'utf8')
     } catch (e) {
-        console.log(e);
+        console.error(e);
     }
 }
 
@@ -86,16 +92,16 @@ function uploadFiles(config) {
     try {
         // List of files to upload
         var files = [{
-            source: "pub/index.html",
+            source: path + "pub/index.html",
             target: config.server.path + "/index.html"
         }, {
-            source: "pub/redirect.json",
+            source: path + "pub/redirect.json",
             target: config.server.path + "/redirect.json"
         }, {
-            source: "pub/style.min.css",
+            source: path + "pub/style.min.css",
             target: config.server.path + "/style.min.css"
         }, {
-            source: "pub/logo-dyn-ip.png",
+            source: path + "pub/logo-dyn-ip.png",
             target: config.server.path + "/logo-dyn-ip.png"
         }];
 
@@ -124,7 +130,7 @@ function uploadFiles(config) {
             password: config.server.password
         });
     } catch (e) {
-        console.log(e);
+        console.error(e);
     }
 }
 
