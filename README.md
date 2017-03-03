@@ -38,11 +38,20 @@ forever start app.js
 ```
 
 ## Start at boot-time on a Raspberry Pi
-First install the app and its dependencies, then install forever
-Then modify the `dyn-ip` file according to your settings, and your node version and directory. You can visit http://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html for more help. You might find the command `which forever` useful.
-3. Copy the file `dyn-ip` to `/etc/init.d` as administrator
-4. Make the script executable with `sudo chmod 755 /etc/init.d/dyn-ip`
-5. Test start your program with `sudo /etc/init.d/dyn-ip start`
-6. Register your script to run at startup with `sudo update-rc.d dyn-ip defaults`
+First install the app and its dependencies, then install forever.
 
+Then modify the `dyn-ip` file according to your settings, and your node version and directory. You can visit http://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html for more help. You might find the command `which forever` useful to know where your forever binary is located.
+
+```bash
+# Copy the file dyn-ip to /etc/init.d as administrator
+sudo cp dyn-ip /etc/init.d
+# Make the script executable
+sudo chmod 755 /etc/init.d/dyn-ip
+# Test start your program
+sudo /etc/init.d/dyn-ip start
+```
+Register your script to run at startup with `sudo update-rc.d dyn-ip defaults`
 You can remove the script from startup with `sudo update-rc.d -f dyn-ip remove`
+
+## Check your log files
+By default when you run forever from init.d, it will output log files in `dyn-ip.log` and `error.log` in the app directory.
