@@ -15,7 +15,7 @@ const defaultRedirect = {
     log: []
 };
 
-const path = '/home/nicolas/programming/dyn-ip/';
+const path = '/home/volumio/dyn-ip/';
 
 /**
  * Get config Yaml content, or throw exception on error
