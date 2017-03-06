@@ -19,11 +19,11 @@
 case "$1" in
   start)
     echo "Starting dyn-ip"
-    /bin/forever start -o /home/volumio/dyn-ip/dyn-ip.log -e /home/volumio/dyn-ip/error.log /home/volumio/dyn-ip/app.js
+    sudo /bin/forever start -o /home/volumio/dyn-ip/dyn-ip.log -e /home/volumio/dyn-ip/error.log /home/volumio/dyn-ip/app.js
     ;;
   stop)
     echo "Stopping dyn-ip"
-    /bin/forever stop /home/volumio/dyn-ip/app.js
+    sudo /bin/forever stop /home/volumio/dyn-ip/app.js
     ;;
   *)
     echo "Usage: /etc/init.d/dyn-ip {start|stop}"
