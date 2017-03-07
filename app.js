@@ -75,7 +75,6 @@ function writeJson(fileName, content) {
  */
 function getRule(config){
     var rule = "";
-    rule += config.refreshTime.second != '*' ? config.refreshTime.second + " " : '* ';
     rule += config.refreshTime.minute != '*' ? config.refreshTime.minute + " " : '* ';
     rule += config.refreshTime.hour != '*' ? config.refreshTime.hour + " " : '* ';
     rule += config.refreshTime.day != '*' ? config.refreshTime.day + " " : '* ';

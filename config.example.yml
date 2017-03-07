@@ -1,6 +1,5 @@
-refreshTime: # Check http://www.crontab.org for scheduling syntax guide
-  second: '0' # Zero is necessary when a value is declared later, like here for 'hour'
-  minute: '0'
+refreshTime: # Check https://crontab.guru/#0_*/3_*_*_* or http://www.crontab.org for scheduling syntax guide
+  minute: '0' # Zero is necessary when a value is declared later, like here for 'hour'
   hour: '*/3' # The job will execute every three hours
   day: '*'
   month: '*'
