@@ -29,10 +29,10 @@ function readYaml(fileName, killOnError) {
         return yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
     } catch (e) {
         if (e.code == 'ENOENT') {
-            if (fileName == "config.yml"){
+            if (fileName.indexOf("config.yml") > -1){
                 console.error("ERROR: The file " + fileName + " does not exist.");
                 console.error("Create one from 'config.example.yml'.");
-            } else if (fileName == "history.yml"){
+            } else if (fileName.indexOf("history.yml") > -1){
                 return defaultRedirect;
             } else console.error("ERROR: The file " + fileName + " does not exist.");
         } else console.error(e);
