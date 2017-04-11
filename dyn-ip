@@ -4,7 +4,9 @@
 ### BEGIN INIT INFO
 # Provides:          dyn-ip
 # Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
 # Short-Description: Starts dyn-ip as a cron at boot
 # Description:       Starts dyn-ip as a cron at boot. More info under https://github.com/nbaudet/dyn-ip
 ### END INIT INFO
@@ -19,8 +21,11 @@ case "$1" in
     echo "Starting dyn-ip"
     sudo /usr/local/bin/node /home/volumio/dyn-ip/app.js
     ;;
+  stop)
+    echo "Stopping dyn-ip: not implemented"
+    ;;
   *)
-    echo "Usage: /etc/init.d/dyn-ip {start}"
+    echo "Usage: /etc/init.d/dyn-ip {start|stop}"
     exit 1
     ;;
 esac
