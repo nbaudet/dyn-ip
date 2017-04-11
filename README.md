@@ -3,7 +3,7 @@
 Let this soft run on any machine on your local network, and it will update a file on your web server with your public IP through FTP.
 It is useful when you have a dynamic IP address AND a webserver and don't want to use a dynDNS client.
 
-## Installation
+## Installation & configuration
 Prerequisite: you need to have Node.js and Git installed on your machine.
 
 ```bash
@@ -14,33 +14,27 @@ npm install
 
 # Configure execution
 cp config.example.yml config.yml
-# -> Now edit config.yml with nano or vim
+# Now edit config.yml with nano or vim
+nano config.yml
+```
 
-# -> Set the path in ´app.js´ at line 18, to the folder where dyn-ip is installed
+1. On your FTP server, create the folder where the files should be served, i.e. "dyn-ip".
+2. Copy the file `config.example.yml`, name it `config.yml` and set the correct FTP values. Set the path to where you want the files to be uploaded, i.e. "dyn-ip". **Be careful not to overwrite an existing index.html file** by giving an existing path. The cron configuration follows this specification: http://crontab.org/
 
+## Running
+```bash
 # Execute just once
 node app.js once
+# Execute once without logging
+node app.js once nolog
 # Or launch the cron
 node app.js
 ```
 
-1. On your FTP server, create the folder where the files should be served, i.e. "dyn-ip".
-2. Rename or copy `config.example.yml` to `config.yml` and set the correct FTP values. Set the path to the where you want the files to be uploaded, i.e. "dyn-ip". **Be careful not to overwrite an existing index.html file** by giving an existing path. The cron configuration follows this specification: http://crontab.org/
-
-## Launch as a deamon
-You must install `forever` globally
-```bash
-sudo npm install -g forever
-```
-Then launch the program with
-```bash
-forever start app.js
-```
-
 ## Start at boot-time on a Raspberry Pi
-First install the app and its dependencies, then install forever.
+First install the app and its dependencies.
 
-Then modify the `dyn-ip` file according to your settings, and your node version and directory. You can visit http://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html for more help. You might find the command `which forever` useful to know where your forever binary is located.
+Then modify the `dyn-ip` file according to your settings, and your node version and directory at line 20. You can visit http://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html for more help. You might find the command `which node` useful to know where your node binary is located.
 
 ```bash
 # Copy the file dyn-ip to /etc/init.d as administrator

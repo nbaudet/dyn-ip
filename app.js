@@ -1,21 +1,22 @@
+const dirname = __dirname + '/';
 const schedule = require('node-schedule');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const argv = require('yargs')
-    .usage('Usage: node $0 <once>')
+    .usage('Usage: node $0 <once> <nolog>')
     .describe('once', 'Run only the script once. Without this parameter, dyn-ip will run as a cron, as specified in config.yml')
+    .describe ('nolog', 'Does not log console outputs and errors in designated files.')
     .help('h')
     .alias('h', 'help')
     .argv;
 const publicIp = require('public-ip');
 const nodeFtp = require('ftp');
+const winston = require('winston');
 
 const defaultRedirect = {
     lastIp: '',
     log: []
 };
-
-const path = '/home/volumio/dyn-ip/';
 
 /**
  * Get config Yaml content, or throw exception on error
@@ -25,17 +26,17 @@ const path = '/home/volumio/dyn-ip/';
 function readYaml(fileName, killOnError) {
     killOnError = (typeof killOnError !== 'undefined') ? killOnError : true;
     try {
-        fileName = path + fileName;
+        fileName = dirname + fileName;
         return yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
     } catch (e) {
         if (e.code == 'ENOENT') {
             if (fileName.indexOf("config.yml") > -1){
-                console.error("ERROR: The file " + fileName + " does not exist.");
-                console.error("Create one from 'config.example.yml'.");
+                logger.error("ERROR: The file " + fileName + " does not exist.");
+                logger.error("Create one from 'config.example.yml'.");
             } else if (fileName.indexOf("history.yml") > -1){
                 return defaultRedirect;
-            } else console.error("ERROR: The file " + fileName + " does not exist.");
-        } else console.error(e);
+            } else logger.error("ERROR: The file " + fileName + " does not exist.");
+        } else logger.error(e);
 
         if (killOnError) process.exit();
     }
@@ -48,10 +49,10 @@ function readYaml(fileName, killOnError) {
  */
 function writeYaml(fileName, content) {
     try {
-        fileName = path + fileName;
+        fileName = dirname + fileName;
         fs.writeFileSync(fileName, yaml.safeDump(content))
     } catch (e) {
-        console.error(e);
+        logger.error(e);
     }
 }
 
@@ -62,10 +63,10 @@ function writeYaml(fileName, content) {
  */
 function writeJson(fileName, content) {
     try {
-        fileName = path + fileName;
+        fileName = dirname + fileName;
         fs.writeFileSync(fileName, JSON.stringify(content), 'utf8')
     } catch (e) {
-        console.error(e);
+        logger.error(e);
     }
 }
 
@@ -73,7 +74,7 @@ function writeJson(fileName, content) {
  * Return a cron schedule from the config file
  * @param {object} config The program's configuration
  */
-function getRule(config){
+function getCronSchedule(config){
     var rule = "";
     rule += config.refreshTime.minute != '*' ? config.refreshTime.minute + " " : '* ';
     rule += config.refreshTime.hour != '*' ? config.refreshTime.hour + " " : '* ';
@@ -91,24 +92,24 @@ function uploadFiles(config) {
     try {
         // List of files to upload
         var files = [{
-            source: path + "pub/index.html",
+            source: dirname + "pub/index.html",
             target: config.server.path + "/index.html"
         }, {
-            source: path + "pub/redirect.json",
+            source: dirname + "pub/redirect.json",
             target: config.server.path + "/redirect.json"
         }, {
-            source: path + "pub/style.min.css",
+            source: dirname + "pub/style.min.css",
             target: config.server.path + "/style.min.css"
         }, {
-            source: path + "pub/logo-dyn-ip.png",
+            source: dirname + "pub/logo-dyn-ip.png",
             target: config.server.path + "/logo-dyn-ip.png"
         }];
 
         var ftp = new nodeFtp();
 
         ftp.on('greeting', function(msg) {
-            console.log("FTP server is greeting with:")
-            console.log(msg);
+            logger.info("FTP server is greeting with:")
+            logger.info(msg);
         }).on('ready', function() {
             // TODO: Tests existence of destination folder and create it if needed
             // ...
@@ -116,7 +117,7 @@ function uploadFiles(config) {
             files.forEach(function(element) {
                 ftp.put(element.source, element.target, function(err) {
                     if (err) throw err;
-                    else console.log(element.source + " was uploaded to " + element.target);
+                    else logger.info(element.source + " was uploaded to " + element.target);
                     ftp.end();
                 });
             })
@@ -129,7 +130,7 @@ function uploadFiles(config) {
             password: config.server.password
         });
     } catch (e) {
-        console.error(e);
+        logger.error(e);
     }
 }
 
@@ -141,11 +142,11 @@ function main() {
 
     // Get the public IP
     publicIp.v4({ https: true }).then(currentIp => {
-        console.log('Current IP : ' + currentIp + " @ " + new Date());
+        logger.info('Current IP : ' + currentIp + " @ " + new Date());
 
         // If there is a new IP...
         if (currentIp != history.lastIp) {
-            console.log("Writing a new IP to config file and uploading...");
+            logger.info("Writing a new IP to config file and uploading...");
 
             history.log.unshift({ ip: currentIp, date: new Date() });
             history.lastIp = currentIp;
@@ -157,18 +158,51 @@ function main() {
             // ... and uploads the file
             uploadFiles(config);
         } else {
-            console.log('Nothing to update');
+            logger.info('Nothing to update');
         }
     });
 }
 
 var config = readYaml('config.yml');
 
+var logger = new (winston.Logger)({
+    transports: [
+        new (winston.transports.Console)()
+    ]
+});
+
+// Enables file logging except if 'nolog' is set
+if(argv._.indexOf('nolog') == -1){
+    logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.Console)(),
+            new (winston.transports.File)({
+                name: 'dyn-ip',
+                filename: 'dyn-ip.log',
+                level: 'info',
+                json: false,
+                timestamp: function() {
+                        return new Date();
+                    },
+                }),
+            new (winston.transports.File)({
+                name: 'error',
+                filename: 'error.log',
+                level: 'error',
+                json: false,
+                timestamp: function() {
+                    return new Date();
+                }
+            })
+    ]
+});
+}
+
 // Checks if the argument 'once' is set or launches the cron
-if(argv._ == 'once'){
-    console.log('Launching dyn-ip ONCE')
+if(argv._.indexOf('once') > -1){
+    logger.info('Launching dyn-ip ONCE @ ' + new Date());
     main();
 } else {
-    console.log('Launching dyn-ip as a CRON')
-    schedule.scheduleJob(getRule(config), main);
+    logger.info('Launching dyn-ip as a CRON @ ' + new Date());
+    schedule.scheduleJob(getCronSchedule(config), main);
 }

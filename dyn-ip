@@ -4,11 +4,9 @@
 ### BEGIN INIT INFO
 # Provides:          dyn-ip
 # Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
 # Default-Start:     2 3 4 5
-# Default-Stop:      0 1 6
-# Short-Description: Starts dyn-ip as a deamon at boot
-# Description:       Starts dyn-ip as a deamon at boot and stops it at shutdown
+# Short-Description: Starts dyn-ip as a cron at boot
+# Description:       Starts dyn-ip as a cron at boot. More info under https://github.com/nbaudet/dyn-ip
 ### END INIT INFO
 
 # Author: Nicolas Baudet
@@ -19,14 +17,10 @@
 case "$1" in
   start)
     echo "Starting dyn-ip"
-    sudo /bin/forever start -o /home/volumio/dyn-ip/dyn-ip.log -e /home/volumio/dyn-ip/error.log /home/volumio/dyn-ip/app.js
-    ;;
-  stop)
-    echo "Stopping dyn-ip"
-    sudo /bin/forever stop /home/volumio/dyn-ip/app.js
+    sudo /usr/local/bin/node /home/volumio/dyn-ip/app.js
     ;;
   *)
-    echo "Usage: /etc/init.d/dyn-ip {start|stop}"
+    echo "Usage: /etc/init.d/dyn-ip {start}"
     exit 1
     ;;
 esac
