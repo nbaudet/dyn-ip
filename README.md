@@ -11,15 +11,17 @@ Prerequisite: you need to have Node.js and Git installed on your machine.
 git clone https://github.com/nbaudet/dyn-ip.git
 cd dyn-ip
 npm install
-
-# Configure execution
-cp config.example.yml config.yml
-# Now edit config.yml with nano or vim
-nano config.yml
 ```
 
 1. On your FTP server, create the folder where the files should be served, i.e. "dyn-ip".
-2. Copy the file `config.example.yml`, name it `config.yml` and set the correct FTP values. Set the path to where you want the files to be uploaded, i.e. "dyn-ip". **Be careful not to overwrite an existing index.html file** by giving an existing path. The cron configuration follows this specification: http://crontab.org/
+2. With the second command below, open the file `config.yml` with nano and set the correct FTP values. Set the path to where you want the files to be uploaded, i.e. "dyn-ip". **Be careful not to overwrite an existing index.html file by giving a wrong path**. The cron configuration follows this specification: http://crontab.org/
+
+```bash
+# Configure execution
+cp example.config.yml config.yml
+# Now edit config.yml with nano or vim
+nano config.yml
+```
 
 ## Running
 ```bash
@@ -34,18 +36,22 @@ node app.js
 ## Start at boot-time on a Raspberry Pi
 First install the app and its dependencies.
 
-Then modify the `dyn-ip` file according to your settings, and your node version and directory at line 20. You can visit http://www.stuffaboutcode.com/2012/06/raspberry-pi-run-program-at-start-up.html for more help. You might find the command `which node` useful to know where your node binary is located.
-
+Then start dyn-ip at boot by editing your cron tasks:
 ```bash
-# Copy the file dyn-ip to /etc/init.d as administrator
-sudo cp dyn-ip /etc/init.d
-# Make the script executable
-sudo chmod 755 /etc/init.d/dyn-ip
-# Test start your program
-sudo /etc/init.d/dyn-ip start
+crontab -e
 ```
-Register your script to run at startup with `sudo update-rc.d dyn-ip defaults`
-You can remove the script from startup with `sudo update-rc.d -f dyn-ip remove`
+Add the following lines at the end of the file:
+```bash
+# Starts dyn-ip at reboot and writes the launch time in startup.log
+@reboot /usr/local/bin/node /home/<your user>/dyn-ip/app.js >> /home/<your user>/dyn-ip/startup.log &
+```
+*You might find the command `which node` useful to know where your node binary is located.*
+
+If the command `crontab -e` does not open up your preferred editor, you might have to install it:
+```bash
+sudo apt-get update && apt-get install cron
+```
 
 ## Check your log files
-By default when you run forever from init.d, it will output log files in `dyn-ip.log` and `error.log` in the app directory.
+Check that the app started as a cron by opening `startup.log`. You should see a line whith the boot time.
+Afterwards, the app will append the logs in `dyn-ip.log` and `error.log` in the app directory.

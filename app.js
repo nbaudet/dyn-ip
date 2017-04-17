@@ -178,7 +178,7 @@ if(argv._.indexOf('nolog') == -1){
             new (winston.transports.Console)(),
             new (winston.transports.File)({
                 name: 'dyn-ip',
-                filename: 'dyn-ip.log',
+                filename: dirname + 'dyn-ip.log',
                 level: 'info',
                 json: false,
                 timestamp: function() {
@@ -187,7 +187,7 @@ if(argv._.indexOf('nolog') == -1){
                 }),
             new (winston.transports.File)({
                 name: 'error',
-                filename: 'error.log',
+                filename: dirname + 'error.log',
                 level: 'error',
                 json: false,
                 timestamp: function() {
