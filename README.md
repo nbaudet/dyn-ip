@@ -34,7 +34,7 @@ node app.js
 ```
 
 ## Start at boot-time on a Raspberry Pi
-First install the app and its dependencies.
+First install the app and its dependencies, then configure and run it, to make sure that it's working.
 
 Then start dyn-ip at boot by editing your cron tasks:
 ```bash
