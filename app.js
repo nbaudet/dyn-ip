@@ -13,6 +13,23 @@ const publicIp = require('public-ip');
 const nodeFtp = require('ftp');
 const winston = require('winston');
 
+/**
+ * Express routes to check if dyn-ip is still running.
+ */
+const express = require('express');
+var xpres = express();
+xpres.disable('x-powered-by');
+xpres.get('/', function (req, res){
+    res.send('<html><body><h2>dyn-ip is running fine.</h2></body></html>');
+});
+xpres.post('/', function (req, res){
+    res.send({
+        'application': 'dyn-ip',
+        'status': 'ok',
+        'message': 'dyn-ip is running fine.'
+    });
+});
+
 const defaultRedirect = {
     lastIp: '',
     log: []
@@ -206,3 +223,6 @@ if(argv._.indexOf('once') > -1){
     logger.info('Launching dyn-ip as a CRON @ ' + new Date());
     schedule.scheduleJob(getCronSchedule(config), main);
 }
+
+// Service 
+xpres.listen(config.service.port);

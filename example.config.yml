@@ -9,3 +9,5 @@ server:
   username: yourLogin
   password: yourPassword
   path: yourPath
+service:
+  port: 8081 # Port for the local info service
