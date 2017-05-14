@@ -35,7 +35,9 @@ node app.js
 
 ## Check if dyn-ip is running
 You can ask for dyn-ip's status by visiting the host's IP with a web browser (i.e. http://localhost:8081), or using a POST request.
-If the service is running, you should see "dyn-ip is running fine.", otherwise you'll get an ERR_CONNECTION_REFUSED error.
+
+If the service is running, you should see "dyn-ip is running fine.", otherwise you'll get an `ERR_CONNECTION_REFUSED` error.
+
 The default port is 8081 but it can be changed in the config.yml file under service -> port.
 
 ## Start at boot-time on a Raspberry Pi
