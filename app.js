@@ -1,5 +1,5 @@
 const dirname = __dirname + '/';
-const schedule = require('node-schedule');
+const cron = require('node-cron');
 const yaml = require('js-yaml');
 const fs = require('fs');
 const argv = require('yargs')
@@ -159,7 +159,7 @@ function main() {
 
     // Get the public IP
     publicIp.v4({ https: true }).then(currentIp => {
-        logger.info('Current IP : ' + currentIp + " @ " + new Date());
+        logger.info('Current IP : ' + currentIp);
 
         // If there is a new IP...
         if (currentIp != history.lastIp) {
@@ -217,11 +217,11 @@ if(argv._.indexOf('nolog') == -1){
 
 // Checks if the argument 'once' is set or launches the cron
 if(argv._.indexOf('once') > -1){
-    logger.info('Launching dyn-ip ONCE @ ' + new Date());
+    logger.info('Launching dyn-ip ONCE');
     main();
 } else {
-    logger.info('Launching dyn-ip as a CRON @ ' + new Date());
-    schedule.scheduleJob(getCronSchedule(config), main);
+    logger.info('Launching dyn-ip as a CRON');
+    cron.schedule(getCronSchedule(config), main);
 }
 
 // Service 
