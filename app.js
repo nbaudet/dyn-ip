@@ -5,7 +5,7 @@ const fs = require('fs');
 const argv = require('yargs')
     .usage('Usage: node $0 <once> <nolog>')
     .describe('once', 'Run only the script once. Without this parameter, dyn-ip will run as a cron, as specified in config.yml')
-    .describe ('nolog', 'Does not log console outputs and errors in designated files.')
+    .describe('nolog', 'Does not log console outputs and errors in designated files.')
     .help('h')
     .alias('h', 'help')
     .argv;
@@ -19,10 +19,10 @@ const winston = require('winston');
 const express = require('express');
 var xpres = express();
 xpres.disable('x-powered-by');
-xpres.get('/', function (req, res){
+xpres.get('/', function (req, res) {
     res.send('<html><body><h2>dyn-ip is running fine.</h2></body></html>');
 });
-xpres.post('/', function (req, res){
+xpres.post('/', function (req, res) {
     res.send({
         'application': 'dyn-ip',
         'status': 'ok',
@@ -47,10 +47,10 @@ function readYaml(fileName, killOnError) {
         return yaml.safeLoad(fs.readFileSync(fileName, 'utf8'));
     } catch (e) {
         if (e.code == 'ENOENT') {
-            if (fileName.indexOf("config.yml") > -1){
+            if (fileName.indexOf("config.yml") > -1) {
                 logger.error("ERROR: The file " + fileName + " does not exist.");
                 logger.error("Create one from 'config.example.yml'.");
-            } else if (fileName.indexOf("history.yml") > -1){
+            } else if (fileName.indexOf("history.yml") > -1) {
                 return defaultRedirect;
             } else logger.error("ERROR: The file " + fileName + " does not exist.");
         } else logger.error(e);
@@ -91,7 +91,7 @@ function writeJson(fileName, content) {
  * Return a cron schedule from the config file
  * @param {object} config The program's configuration
  */
-function getCronSchedule(config){
+function getCronSchedule(config) {
     var rule = "";
     rule += config.refreshTime.minute != '*' ? config.refreshTime.minute + " " : '* ';
     rule += config.refreshTime.hour != '*' ? config.refreshTime.hour + " " : '* ';
@@ -124,15 +124,15 @@ function uploadFiles(config) {
 
         var ftp = new nodeFtp();
 
-        ftp.on('greeting', function(msg) {
+        ftp.on('greeting', function (msg) {
             logger.info("FTP server is greeting with:")
             logger.info(msg);
-        }).on('ready', function() {
+        }).on('ready', function () {
             // TODO: Tests existence of destination folder and create it if needed
             // ...
 
-            files.forEach(function(element) {
-                ftp.put(element.source, element.target, function(err) {
+            files.forEach(function (element) {
+                ftp.put(element.source, element.target, function (err) {
                     if (err) throw err;
                     else logger.info(element.source + " was uploaded to " + element.target);
                     ftp.end();
@@ -189,7 +189,7 @@ var logger = new (winston.Logger)({
 });
 
 // Enables file logging except if 'nolog' is set
-if(argv._.indexOf('nolog') == -1){
+if (argv._.indexOf('nolog') == -1) {
     logger = new (winston.Logger)({
         transports: [
             new (winston.transports.Console)(),
@@ -198,25 +198,26 @@ if(argv._.indexOf('nolog') == -1){
                 filename: dirname + 'dyn-ip.log',
                 level: 'info',
                 json: false,
-                timestamp: function() {
-                        return new Date();
-                    },
-                }),
+                timestamp: function () {
+                    return new Date();
+                },
+                maxsize: 1000000, // 1MB
+            }),
             new (winston.transports.File)({
                 name: 'error',
                 filename: dirname + 'error.log',
                 level: 'error',
                 json: false,
-                timestamp: function() {
+                timestamp: function () {
                     return new Date();
                 }
             })
-    ]
-});
+        ]
+    });
 }
 
 // Checks if the argument 'once' is set or launches the cron
-if(argv._.indexOf('once') > -1){
+if (argv._.indexOf('once') > -1) {
     logger.info('Launching dyn-ip ONCE');
     main();
 } else {
