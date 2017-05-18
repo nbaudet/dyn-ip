@@ -222,7 +222,6 @@ if(argv._.indexOf('once') > -1){
 } else {
     logger.info('Launching dyn-ip as a CRON');
     cron.schedule(getCronSchedule(config), main);
+    // Service 
+    xpres.listen(config.service.port);
 }
-
-// Service 
-xpres.listen(config.service.port);
