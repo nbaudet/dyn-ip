@@ -20,13 +20,16 @@ const express = require('express');
 var xpres = express();
 xpres.disable('x-powered-by');
 xpres.get('/', function (req, res){
-    res.send('<html><body><h2>dyn-ip is running fine.</h2></body></html>');
+    res.send('<html><body><h2>dyn-ip is running fine.</h2>\
+    <p>Last check: ' + getLastCheck() + '</p>\
+    </body></html>');
 });
 xpres.post('/', function (req, res){
     res.send({
         'application': 'dyn-ip',
         'status': 'ok',
-        'message': 'dyn-ip is running fine.'
+        'message': 'dyn-ip is running fine.',
+        'lastCheck': getLastCheck()
     });
 });
 
@@ -34,6 +37,21 @@ const defaultRedirect = {
     lastIp: '',
     log: []
 };
+
+/**
+ * Returns the last IP check from dyn-ip.log or "No log file yet."
+ */
+function getLastCheck(){
+    var lastChecked = "";
+    try {
+        var logFile = fs.readFileSync(dyn-ip.log, 'utf8');
+        lastChecked = logFile.substring(logFile.lastIndexOf("\n"));
+        console.log("LAST CHECK: " + lastChecked);
+    } catch (e) {
+        lastChecked = "No log file yet.";
+    }
+    return lastChecked;
+}
 
 /**
  * Get config Yaml content, or throw exception on error
