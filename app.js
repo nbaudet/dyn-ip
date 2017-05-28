@@ -19,9 +19,9 @@ const winston = require('winston');
 const express = require('express');
 var xpres = express();
 xpres.disable('x-powered-by');
-xpres.get('/', function (req, res){
+xpres.get('/', function (req, res) {
     res.send('<html><body><h2>dyn-ip is running fine.</h2>\
-    <p>Last check: ' + getLastCheckDate() + '</p>\
+    <p>Last check: ' + getLastCheckDate(true) + '</p>\
     </body></html>');
 });
 xpres.post('/', function (req, res) {
@@ -40,16 +40,19 @@ const defaultHistory = {
 };
 
 /**
- * Returns the last IP check date from history.yml or "No log file yet."
+ * Returns the last IP check date from history.yml or "No history file yet."
+ * @param {boolean} format Formats the date in readable ISO format. Default: false
  */
-function getLastCheckDate(){
+function getLastCheckDate(format) {
     var lastChecked = "";
+    format = format || false;
     try {
         var history = readYaml('history.yml', false);
-        lastChecked = history.lastCheck.toISOString().
-        replace(/T/, ' '). // Replace T with a space
-        replace(/\..+/, ''); // Delete the dot and everything after
-        console.log("LAST CHECK: " + lastChecked);
+        lastChecked = history.lastCheck.toISOString();
+        if (format) {
+            lastChecked = lastChecked.replace(/T/, ' '). // Replace T with a space
+                replace(/\..+/, ''); // Delete the dot and everything after
+        }
     } catch (e) {
         console.log(e);
         lastChecked = "No history file yet.";
