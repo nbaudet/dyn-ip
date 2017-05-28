@@ -21,7 +21,7 @@ var xpres = express();
 xpres.disable('x-powered-by');
 xpres.get('/', function (req, res){
     res.send('<html><body><h2>dyn-ip is running fine.</h2>\
-    <p>Last check: ' + getLastCheck() + '</p>\
+    <p>Last check: ' + getLastCheckDate() + '</p>\
     </body></html>');
 });
 xpres.post('/', function (req, res) {
@@ -29,26 +29,30 @@ xpres.post('/', function (req, res) {
         'application': 'dyn-ip',
         'status': 'ok',
         'message': 'dyn-ip is running fine.',
-        'lastCheck': getLastCheck()
+        'lastCheck': getLastCheckDate()
     });
 });
 
-const defaultRedirect = {
+const defaultHistory = {
     lastIp: '',
+    lastCheck: '',
     log: []
 };
 
 /**
- * Returns the last IP check from dyn-ip.log or "No log file yet."
+ * Returns the last IP check date from history.yml or "No log file yet."
  */
-function getLastCheck(){
+function getLastCheckDate(){
     var lastChecked = "";
     try {
-        var logFile = fs.readFileSync(dyn-ip.log, 'utf8');
-        lastChecked = logFile.substring(logFile.lastIndexOf("\n"));
+        var history = readYaml('history.yml', false);
+        lastChecked = history.lastCheck.toISOString().
+        replace(/T/, ' '). // Replace T with a space
+        replace(/\..+/, ''); // Delete the dot and everything after
         console.log("LAST CHECK: " + lastChecked);
     } catch (e) {
-        lastChecked = "No log file yet.";
+        console.log(e);
+        lastChecked = "No history file yet.";
     }
     return lastChecked;
 }
@@ -69,7 +73,7 @@ function readYaml(fileName, killOnError) {
                 logger.error("ERROR: The file " + fileName + " does not exist.");
                 logger.error("Create one from 'config.example.yml'.");
             } else if (fileName.indexOf("history.yml") > -1) {
-                return defaultRedirect;
+                return defaultHistory;
             } else logger.error("ERROR: The file " + fileName + " does not exist.");
         } else logger.error(e);
 
@@ -185,6 +189,7 @@ function main() {
 
             history.log.unshift({ ip: currentIp, date: new Date() });
             history.lastIp = currentIp;
+            history.lastCheck = new Date();
 
             // ... updates the history (local and public)
             writeYaml('history.yml', history);
