@@ -186,23 +186,25 @@ function main() {
     publicIp.v4({ https: true }).then(currentIp => {
         logger.info('Current IP : ' + currentIp);
 
-        // If there is a new IP...
+        // Updates last check date (local and distant)
+        history.lastCheck = new Date();
+        writeYaml('history.yml', history);
+        writeJson("pub/redirect.json", history);
+
+        // If there is a new IP
         if (currentIp != history.lastIp) {
             logger.info("Writing a new IP to config file and uploading...");
 
             history.log.unshift({ ip: currentIp, date: new Date() });
             history.lastIp = currentIp;
-            history.lastCheck = new Date();
 
-            // ... updates the history (local and public)
-            writeYaml('history.yml', history);
-            writeJson("pub/redirect.json", history);
-
-            // ... and uploads the file
+            // Updates the distant files
             uploadFiles(config);
         } else {
             logger.info('Nothing to update');
         }
+
+
     });
 }
 
