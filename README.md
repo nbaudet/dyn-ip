@@ -43,6 +43,11 @@ The default port is 8081 but it can be changed in the config.yml file under serv
 ## Start at boot-time on a Raspberry Pi
 First install the app and its dependencies, then configure and run it, to make sure that it's working.
 
+Make your script executable :
+```bash
+chmod +x app.js
+```
+
 Then start dyn-ip at boot by editing your cron tasks:
 ```bash
 crontab -e
