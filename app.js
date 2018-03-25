@@ -189,7 +189,6 @@ function main() {
         // Updates last check date (local and distant)
         history.lastCheck = new Date();
         writeYaml('history.yml', history);
-        writeJson("pub/redirect.json", history);
 
         // If there is a new IP
         if (currentIp != history.lastIp) {
@@ -197,6 +196,7 @@ function main() {
 
             history.log.unshift({ ip: currentIp, date: new Date() });
             history.lastIp = currentIp;
+            writeJson("pub/redirect.json", history);
 
             // Updates the distant files
             uploadFiles(config);
